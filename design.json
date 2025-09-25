@@ -1,0 +1,211 @@
+{
+    "design_system": {
+      "name": "Extermina Frango Login",
+      "theme": "premium_minimal_login",
+      "style_category": "dark_gradient_centered",
+      "layout_type": "centered_card_login",
+      
+      "color_palette": {
+        "primary": {
+          "purple_gradient": "linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)",
+          "orange_gradient": "linear-gradient(135deg, #FF8C42 0%, #FF6B9D 100%)",
+          "button_gradient": "linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)",
+          "accent_orange": "#FF8C42",
+          "accent_pink": "#EC4899"
+        },
+        "background": {
+          "main": "#0F0F23",
+          "card": "#FFFFFF",
+          "blur_overlay": "rgba(255, 255, 255, 0.95)",
+          "gradient_bg": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)"
+        },
+        "text": {
+          "primary": "#1F2937",
+          "secondary": "#6B7280",
+          "accent": "#FF8C42",
+          "white": "#FFFFFF",
+          "muted": "#9CA3AF"
+        }
+      },
+  
+      "typography": {
+        "font_family": {
+          "primary": "Inter, system-ui, sans-serif",
+          "headings": "Inter, system-ui, sans-serif"
+        },
+        "font_weights": {
+          "regular": 400,
+          "medium": 500,
+          "semibold": 600,
+          "bold": 700,
+          "extrabold": 800
+        },
+        "font_sizes": {
+          "brand_title": "1.5rem",
+          "login_title": "1.25rem",
+          "body": "0.875rem",
+          "small": "0.75rem",
+          "button": "0.875rem"
+        }
+      },
+  
+      "spacing": {
+        "xs": "0.5rem",
+        "sm": "1rem",
+        "md": "1.5rem",
+        "lg": "2rem",
+        "xl": "3rem"
+      },
+  
+      "page_structure": {
+        "layout": "fullscreen_centered",
+        "background": {
+          "type": "gradient_blur",
+          "gradient": "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+          "blur_effect": "backdrop-filter: blur(100px)"
+        },
+        
+        "main_container": {
+          "position": "center",
+          "max_width": "400px",
+          "padding": "2rem",
+          "background": "#FFFFFF",
+          "border_radius": "1rem",
+          "box_shadow": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+          "backdrop_filter": "blur(20px)"
+        }
+      },
+  
+      "components": {
+        "brand_section": {
+          "layout": "centered",
+          "logo": {
+            "size": "60px",
+            "border_radius": "50%",
+            "background": "linear-gradient(135deg, #FF8C42 0%, #FF6B9D 100%)",
+            "margin_bottom": "1rem"
+          },
+          "title": {
+            "text": "EXTERMINA FRANGO",
+            "font_size": "1.5rem",
+            "font_weight": "bold",
+            "color": "#FF8C42",
+            "letter_spacing": "0.05em",
+            "margin_bottom": "2rem"
+          }
+        },
+  
+        "login_section": {
+          "title": {
+            "text": "🔥 Entrar na sua conta",
+            "font_size": "1.25rem",
+            "font_weight": "semibold",
+            "color": "#1F2937",
+            "margin_bottom": "0.5rem"
+          },
+          "subtitle": {
+            "text": "Pronto para treinar? Ou crie uma nova conta 🚀",
+            "font_size": "0.875rem",
+            "color": "#6B7280",
+            "margin_bottom": "1.5rem"
+          }
+        },
+  
+        "form_fields": {
+          "email": {
+            "label": "E-mail",
+            "placeholder": "Digite seu e-mail",
+            "type": "email",
+            "icon": "mail",
+            "required": true
+          },
+          "password": {
+            "label": "Senha", 
+            "placeholder": "Digite sua senha",
+            "type": "password",
+            "icon": "lock",
+            "required": true
+          }
+        },
+  
+        "input_style": {
+          "background": "#F9FAFB",
+          "border": "1px solid #E5E7EB",
+          "border_radius": "0.5rem",
+          "padding": "0.75rem 1rem",
+          "font_size": "0.875rem",
+          "transition": "all 0.2s ease",
+          "focus": {
+            "border_color": "#FF8C42",
+            "box_shadow": "0 0 0 3px rgba(255, 140, 66, 0.1)"
+          }
+        },
+  
+        "forgot_password": {
+          "text": "🔑 Esqueceu sua senha?",
+          "color": "#FF8C42",
+          "font_size": "0.875rem",
+          "text_decoration": "none",
+          "hover": {
+            "text_decoration": "underline"
+          }
+        },
+  
+        "login_button": {
+          "text": "⭐ Entrar",
+          "background": "linear-gradient(135deg, #FF8C42 0%, #EC4899 100%)",
+          "color": "#FFFFFF",
+          "font_weight": "semibold",
+          "font_size": "0.875rem",
+          "padding": "0.75rem 1.5rem",
+          "border_radius": "0.5rem",
+          "border": "none",
+          "width": "100%",
+          "cursor": "pointer",
+          "transition": "all 0.3s ease",
+          "hover": {
+            "transform": "translateY(-2px)",
+            "box_shadow": "0 10px 25px rgba(255, 140, 66, 0.3)"
+          }
+        }
+      },
+  
+      "responsive": {
+        "mobile": {
+          "container_padding": "1rem",
+          "max_width": "100%",
+          "margin": "1rem"
+        }
+      },
+  
+      "animations": {
+        "card_entrance": {
+          "initial": "opacity: 0, transform: translateY(20px)",
+          "animate": "opacity: 1, transform: translateY(0)",
+          "duration": "0.6s",
+          "easing": "ease-out"
+        },
+        "button_hover": {
+          "transform": "translateY(-2px)",
+          "box_shadow": "0 10px 25px rgba(255, 140, 66, 0.3)",
+          "duration": "0.3s"
+        }
+      },
+  
+      "design_principles": {
+        "layout": "Keep the centered card layout with clean white background",
+        "branding": "Maintain orange/pink gradient theme from Extermina Frango",
+        "simplicity": "Single purpose page - only login functionality",
+        "premium_feel": "Use subtle shadows, smooth transitions, and gradient effects",
+        "user_experience": "Clear visual hierarchy with emoji accents for friendly feel"
+      },
+  
+      "implementation_notes": {
+        "background": "Use the same dark gradient background as Lovro's design",
+        "card_design": "Clean white card with rounded corners and subtle shadow",
+        "brand_consistency": "Orange gradient for brand elements, matching existing login form",
+        "interactivity": "Smooth hover effects on button and form elements",
+        "accessibility": "Proper contrast ratios and focus states for all interactive elements"
+      }
+    }
+  }

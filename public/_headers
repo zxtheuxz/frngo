@@ -1,0 +1,63 @@
+# Headers AGRESSIVOS para controle de cache
+
+# HTML - ZERO cache, sempre buscar do servidor
+/*.html
+/*
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+  Last-Modified: Thu, 01 Jan 1970 00:00:01 GMT
+  ETag: "no-cache"
+
+# Service Worker - ZERO cache
+/sw.js
+/registerSW.js
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+  Last-Modified: Thu, 01 Jan 1970 00:00:01 GMT
+
+# Manifest PWA - ZERO cache
+/manifest.json
+/manifest.webmanifest
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+
+# Assets com hash - cache curto para forçar verificação
+/assets/*
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# JavaScript e CSS - cache muito curto
+*.js
+*.css
+  Cache-Control: public, max-age=300, must-revalidate, stale-while-revalidate=60
+
+# Imagens - cache curto
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.gif
+*.webp
+*.ico
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# Fontes - cache moderado
+*.woff
+*.woff2
+*.ttf
+*.eot
+  Cache-Control: public, max-age=86400, must-revalidate
+
+# API requests - ZERO cache
+/api/*
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+
+# Fallback - tudo sem cache por padrão
+*
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0

@@ -1,0 +1,757 @@
+/* 
+ * Estilos globais da aplicação
+ * Importado em App.tsx
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Removendo transições lentas */
+  * {
+    @apply transition-none;
+  }
+
+  /* Estilos base */
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply bg-white text-gray-900;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  /* Estilos base para o modo claro */
+  :root {
+    --primary-color: #8E2DE2;
+    --secondary-color: #4A00E0;
+    --gradient-primary: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    --gradient-horizontal: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    --dark-bg: #000000;
+    --dark-bg-lighter: #1a1a1a;
+    --dark-bg-lightest: #262626;
+    --light-bg: #ffffff;
+    --light-bg-darker: #f5f5f5;
+    --light-bg-darkest: #e0e0e0;
+    --text-color-dark: #FFFFFF;
+    --text-color-light: #333333;
+    --text-secondary-dark: rgba(255, 255, 255, 0.7);
+    --text-secondary-light: rgba(51, 51, 51, 0.7);
+    --text-muted-dark: rgba(255, 255, 255, 0.5);
+    --text-muted-light: rgba(51, 51, 51, 0.5);
+    --border-color-dark: rgba(255, 255, 255, 0.05);
+    --border-color-light: rgba(0, 0, 0, 0.05);
+    --card-bg-dark: #1a1a1a;
+    --card-bg-light: #ffffff;
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    --transition: all 0.3s ease;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 15px rgba(74, 0, 224, 0.2);
+    --shadow-lg: 0 8px 30px rgba(74, 0, 224, 0.3);
+    
+    /* Variáveis para o dashboard */
+    --brand-dark: #000000;
+    --brand-light: #FFFFFF;
+    --brand-light-blue: rgba(255, 255, 255, 0.7);
+    --brand-light-secondary: rgba(255, 255, 255, 0.5);
+    --brand-purple: #8E2DE2;
+    --brand-purple-light: rgba(142, 45, 226, 0.5);
+    --gradient-brand: linear-gradient(45deg, #8E2DE2, #4A00E0);
+    --shadow-glow-purple: 0 0 15px rgba(142, 45, 226, 0.5);
+    
+    /* Variáveis para responsividade */
+    --container-padding-mobile: 1rem;
+    --container-padding-tablet: 2rem;
+    --container-padding-desktop: 4rem;
+    --font-size-base-mobile: 14px;
+    --font-size-base-desktop: 16px;
+    
+    /* Cores padrão para o tema claro */
+    --bg-color: var(--light-bg);
+    --text-color: var(--text-color-light);
+    --text-secondary: var(--text-secondary-light);
+    --text-muted: var(--text-muted-light);
+    --border-color: var(--border-color-light);
+    --card-bg: var(--card-bg-light);
+  }
+
+  /* Estilos base para o modo escuro */
+  :root[class~="dark"] {
+    --background-primary: theme('colors.slate.900');
+    --background-secondary: theme('colors.slate.800');
+    --text-primary: theme('colors.white');
+    --text-secondary: theme('colors.blue.300');
+    --border-color: theme('colors.blue.500/20');
+    
+    /* Variáveis para o dashboard no modo escuro */
+    --brand-dark: #0F0F14;
+    --brand-light: #FFFFFF;
+    --brand-light-blue: rgba(255, 255, 255, 0.7);
+    --brand-light-secondary: rgba(255, 255, 255, 0.5);
+    
+    /* Cores para o tema escuro */
+    --bg-color: var(--dark-bg);
+    --text-color: var(--text-color-dark);
+    --text-secondary: var(--text-secondary-dark);
+    --text-muted: var(--text-muted-dark);
+    --border-color: var(--border-color-dark);
+    --card-bg: var(--card-bg-dark);
+  }
+
+  /* Aplicar cores base */
+  body {
+    @apply bg-white dark:bg-black text-slate-800 dark:text-white;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  
+  @media (min-width: 768px) {
+    body {
+      font-size: var(--font-size-base-desktop);
+    }
+  }
+}
+
+/* Classes utilitárias personalizadas */
+@layer components {
+  .card {
+    @apply bg-white rounded-lg p-6 shadow-md border border-gray-200;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 font-medium;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 dark:bg-slate-700 
+           hover:bg-gray-300 dark:hover:bg-slate-600 
+           text-gray-800 dark:text-white 
+           transition-all duration-300;
+  }
+}
+
+/* Estilos básicos */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Animações básicas */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+/* Estilos para o layout principal */
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+/* Estilos para cards com efeito glassmorphism */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Tipografia */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+}
+
+p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Links - excluindo todos os tipos de botões e links com classes específicas */
+a:not([class*="button"]):not([class*="btn"]):not(.flex):not(.inline-flex):not([class*="bg-"]) {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:not([class*="button"]):not([class*="btn"]):not(.flex):not(.inline-flex):not([class*="bg-"]):hover {
+  color: var(--secondary-color);
+}
+
+/* Botões */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-secondary:hover {
+  background: rgba(142, 45, 226, 0.1);
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Cards */
+.card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-5px);
+}
+
+/* Formulários */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.2);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+/* Utilitários */
+.text-center {
+  text-align: center;
+}
+
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient {
+  background: var(--gradient-primary);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--container-padding-mobile);
+}
+
+.section {
+  padding: 4rem 0;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes floatIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.page-exit {
+  opacity: 0;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+  }
+  
+  .section {
+    padding: 3rem 0;
+  }
+}
+
+@media (max-width: 576px) {
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+  }
+  
+  .section {
+    padding: 2rem 0;
+  }
+}
+
+/* Variáveis de cores para o tema escuro */
+:root {
+  --brand-dark: #000000;
+  --brand-dark-lighter: #252525;
+  --brand-light: #FFFFFF;
+  --brand-light-secondary: rgba(255, 255, 255, 0.7);
+  --brand-blue: #4A00E0;
+  --brand-light-blue: #8E2DE2;
+  --brand-purple: #8E2DE2;
+  --brand-purple-light: rgba(142, 45, 226, 0.5);
+  --shadow-glow-blue: 0 0 15px rgba(74, 0, 224, 0.5);
+  --shadow-glow-purple: 0 0 15px rgba(142, 45, 226, 0.5);
+  --gradient-brand: linear-gradient(135deg, #8E2DE2, #4A00E0);
+}
+
+/* Estilos para o tema escuro */
+.bg-brand-dark {
+  background-color: var(--brand-dark);
+}
+
+.text-brand-light {
+  color: var(--brand-light);
+}
+
+.text-brand-blue {
+  color: var(--brand-blue);
+}
+
+.text-brand-light-blue {
+  color: var(--brand-light-blue);
+}
+
+.border-brand-purple\/20 {
+  border-color: rgba(142, 45, 226, 0.2);
+}
+
+.shadow-glow-blue {
+  box-shadow: var(--shadow-glow-blue);
+}
+
+.shadow-glow-purple {
+  box-shadow: var(--shadow-glow-purple);
+}
+
+.bg-gradient-brand {
+  background: var(--gradient-brand);
+}
+
+/* Botões */
+.btn-primary {
+  background: var(--gradient-brand);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: var(--shadow-glow-purple);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--brand-purple-light);
+  color: var(--brand-light);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--brand-purple);
+  color: var(--brand-purple);
+}
+
+/* Estilos para os toggles */
+.toggle-checkbox {
+  right: 0;
+  z-index: 1;
+  border-color: #4A00E0;
+  transition: all 0.3s;
+}
+
+.toggle-checkbox:checked {
+  right: 0;
+  border-color: #4A00E0;
+  transform: translateX(100%);
+}
+
+.toggle-checkbox:checked + .toggle-label {
+  background-color: #8E2DE2;
+}
+
+.toggle-label {
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+
+/* Estilos responsivos adicionais */
+/* Ajustes para dispositivos móveis */
+@media (max-width: 640px) {
+  .container {
+    padding-left: var(--container-padding-mobile);
+    padding-right: var(--container-padding-mobile);
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Ajustes para formulários em dispositivos móveis */
+  .form-control {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Ajustes para espaçamento em dispositivos móveis */
+  .section {
+    padding: 2rem 0;
+  }
+}
+
+/* Ajustes para tablets */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container {
+    padding-left: var(--container-padding-tablet);
+    padding-right: var(--container-padding-tablet);
+  }
+}
+
+/* Ajustes para desktop */
+@media (min-width: 1025px) {
+  .container {
+    padding-left: var(--container-padding-desktop);
+    padding-right: var(--container-padding-desktop);
+  }
+}
+
+/* Utilitários para responsividade */
+.hide-on-mobile {
+  @media (max-width: 640px) {
+    display: none !important;
+  }
+}
+
+.hide-on-desktop {
+  @media (min-width: 1025px) {
+    display: none !important;
+  }
+}
+
+.show-on-mobile {
+  @media (min-width: 641px) {
+    display: none !important;
+  }
+}
+
+/* Ajustes para o menu móvel */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+  backdrop-filter: blur(4px);
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 80%;
+  max-width: 300px;
+  background-color: var(--dark-bg);
+  z-index: 50;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+/* Ajustes para o layout flexível */
+.flex-col-mobile {
+  @media (max-width: 640px) {
+    flex-direction: column !important;
+  }
+}
+
+.flex-row-mobile {
+  @media (max-width: 640px) {
+    flex-direction: row !important;
+  }
+}
+
+/* Ajustes para textos responsivos */
+.text-responsive {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.heading-responsive {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+}
+
+/* Ajustes para imagens responsivas */
+.img-responsive {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ajustes para botões em dispositivos móveis */
+@media (max-width: 640px) {
+  .btn-mobile-full {
+    width: 100%;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Garantir que os botões da avaliação não sejam afetados pelos estilos globais */
+.avaliacao-button-primary,
+.avaliacao-button-primary:hover,
+.avaliacao-button-primary:focus,
+.avaliacao-button-primary:active {
+  color: #000000 !important;
+  text-decoration: none !important;
+}
+
+.avaliacao-button-secondary,
+.avaliacao-button-secondary:hover,
+.avaliacao-button-secondary:focus,
+.avaliacao-button-secondary:active {
+  color: var(--avaliacao-orange-light) !important;
+  text-decoration: none !important;
+}
+
+/* Garantir que os links dentro do formulário nutricional não sejam afetados por outros estilos */
+.avaliacao-container a,
+.avaliacao-form a,
+.avaliacao-card a,
+.avaliacao-nav-buttons a {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+.avaliacao-container a:hover,
+.avaliacao-form a:hover,
+.avaliacao-card a:hover,
+.avaliacao-nav-buttons a:hover,
+.avaliacao-container a:focus,
+.avaliacao-form a:focus,
+.avaliacao-card a:focus,
+.avaliacao-nav-buttons a:focus,
+.avaliacao-container a:active,
+.avaliacao-form a:active,
+.avaliacao-card a:active,
+.avaliacao-nav-buttons a:active {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+/* Estilos base */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tema claro (padrão) */
+:root {
+  --bg-color: #f8fafc;
+  --text-color: #333333;
+  --text-secondary: #666666;
+  --card-bg: #ffffff;
+  --card-border: rgba(142, 45, 226, 0.2);
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --primary-color: #8E2DE2;
+  --secondary-color: #4A00E0;
+  --accent-color: #FF8C00;
+  --gradient-primary: linear-gradient(45deg, #8E2DE2, #4A00E0);
+  --gradient-accent: linear-gradient(45deg, #FF8C00, #f50404);
+}
+
+/* Tema escuro */
+.dark {
+  --bg-color: #0f172a;
+  --text-color: #ffffff;
+  --text-secondary: #cbd5e1;
+  --card-bg: rgba(30, 41, 59, 0.8);
+  --card-border: rgba(142, 45, 226, 0.3);
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Layout */
+.app-container {
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* Utilitários */
+.no-underline {
+  text-decoration: none !important;
+}
+
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-accent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.5s ease-out forwards;
+} 
