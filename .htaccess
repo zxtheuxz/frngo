@@ -1,0 +1,47 @@
+# .htaccess para Apache - Cache Busting Ultra Agressivo
+# Para uso em ambientes Apache ou hospedagem compartilhada
+
+<IfModule mod_headers.c>
+    # HTML - Nunca cachear
+    <FilesMatch "\.(html|htm)$">
+        Header always set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+        Header always set Pragma "no-cache"
+        Header always set Expires "-1"
+        Header always set Last-Modified "Thu, 01 Jan 1970 00:00:00 GMT"
+        Header always unset ETag
+        FileETag None
+    </FilesMatch>
+
+    # JavaScript e CSS - Cache mínimo com validação obrigatória
+    <FilesMatch "\.(js|css)$">
+        Header always set Cache-Control "no-cache, must-revalidate, max-age=0"
+        Header always set Pragma "no-cache"
+        Header always set Expires "-1"
+        Header always unset ETag
+        FileETag None
+    </FilesMatch>
+
+    # Service Worker - Nunca cachear
+    <FilesMatch "sw\.js$">
+        Header always set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+        Header always set Pragma "no-cache"
+        Header always set Expires "-1"
+    </FilesMatch>
+
+    # Manifest PWA - Cache curto
+    <FilesMatch "manifest\.json$">
+        Header always set Cache-Control "no-cache, max-age=60"
+    </FilesMatch>
+
+    # Imagens - Cache moderado
+    <FilesMatch "\.(png|jpg|jpeg|gif|svg|ico|webp)$">
+        Header always set Cache-Control "no-cache, max-age=300"
+    </FilesMatch>
+</IfModule>
+
+# Força uso de HTTPS
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>

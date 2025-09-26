@@ -34,6 +34,12 @@ interface Exercicio {
   intensidade?: 'baixa' | 'media' | 'alta';
 }
 
+interface Cardio {
+  tempo: string;
+  tipos: string[];
+  observacoes?: string;
+}
+
 interface Treino {
   letra: string;
   descricao: string;
@@ -41,6 +47,7 @@ interface Treino {
   exercicios: Exercicio[];
   mes?: number;
   semana?: number;
+  cardio?: Cardio;
 }
 
 interface TreinoPorMes {
@@ -599,23 +606,23 @@ export function ResultadoFisico() {
             
             for (let i = 0; i < linhas.length; i++) {
               const linha = linhas[i].trim();
-              
+
               // Verificar se é uma linha de treino
               const matchTreino = linha.match(regexTreino);
-              
+
               if (matchTreino) {
                 // Se já temos um treino atual, adicionar ao array
                 if (treinoAtual) {
                   treinos.push(treinoAtual);
                 }
-                
+
                 const descricaoCompleta = matchTreino[2] || '';
-                
+
                 // Extrair o mês da descrição usando regex para parênteses
                 let mes = 1; // Default
                 const regexMes = /\((.*?mês.*?)\)/i;
                 const matchMes = descricaoCompleta.match(regexMes);
-                
+
                 if (matchMes) {
                   const textoMes = matchMes[1].toLowerCase();
                   if (textoMes.includes('primeiro') || textoMes.includes('1')) {
@@ -626,9 +633,9 @@ export function ResultadoFisico() {
                     mes = 3;
                   }
                 }
-                
+
                 // console.log(`Processando treino: ${linha}, Mês extraído: ${mes}`);
-                
+
                 // Criar novo treino
                 treinoAtual = {
                   letra: matchTreino[1], // A, B, C, etc.
@@ -637,6 +644,56 @@ export function ResultadoFisico() {
                   exercicios: [],
                   mes: mes // Adicionar o mês extraído
                 };
+                continue;
+              }
+
+              // Verificar se é uma seção de cardio
+              if (linha.match(/TREINO\s+AERÓBIO|TREINO\s+AEROBIO|CARDIO/i)) {
+                if (treinoAtual) {
+                  // Processar as próximas linhas para extrair informações de cardio
+                  let tempo = '';
+                  let tipos: string[] = [];
+                  let observacoes = '';
+
+                  // Verificar as próximas linhas para tempo e tipos
+                  for (let j = i + 1; j < linhas.length && j < i + 5; j++) {
+                    const linhaCardio = linhas[j].trim();
+
+                    // Extrair tempo
+                    const matchTempo = linhaCardio.match(/TEMPO:\s*(.+)/i);
+                    if (matchTempo) {
+                      tempo = matchTempo[1].trim();
+                      continue;
+                    }
+
+                    // Extrair tipos
+                    const matchTipo = linhaCardio.match(/TIPO:\s*(.+)/i);
+                    if (matchTipo) {
+                      const tiposTexto = matchTipo[1].trim();
+                      // Extrair tipos entre parênteses ou separados por /
+                      tipos = tiposTexto
+                        .replace(/[()]/g, '')
+                        .split(/\/|\s*,\s*/)
+                        .map(t => t.trim())
+                        .filter(t => t.length > 0);
+                      continue;
+                    }
+
+                    // Se encontrar "OBS:" ou "**TOTALIZANDO", parar
+                    if (linhaCardio.match(/OBS:|TOTALIZANDO|\*\*/i) || linhaCardio.match(/TREINO\s+[A-Z]/i)) {
+                      break;
+                    }
+                  }
+
+                  // Adicionar informações de cardio ao treino atual
+                  if (tempo || tipos.length > 0) {
+                    treinoAtual.cardio = {
+                      tempo: tempo || '30 MINUTOS',
+                      tipos: tipos.length > 0 ? tipos : ['ESTEIRA', 'TRANSPORT', 'BIKE', 'CAMINHADA'],
+                      observacoes
+                    };
+                  }
+                }
                 continue;
               }
               
@@ -1289,6 +1346,47 @@ export function ResultadoFisico() {
             <ExercicioCard key={exIndex} exercicio={exercicio} index={exIndex} />
             ))}
         </div>
+
+        {/* Seção de Cardio */}
+        {treino.cardio && (
+          <div className="bg-gradient-to-r from-orange-500 to-red-500 px-4 py-3 mb-4">
+            <div className="flex items-center mb-2">
+              <div className="bg-white/20 rounded-full w-8 h-8 flex items-center justify-center mr-3">
+                <span className="text-white font-bold">♥</span>
+              </div>
+              <h3 className="text-base font-semibold text-white">
+                TREINO AERÓBIO (CARDIO)
+              </h3>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-sm p-3 space-y-2">
+              <div className="flex items-center">
+                <span className="text-white/90 font-medium mr-2">TEMPO:</span>
+                <span className="text-white font-semibold">{treino.cardio.tempo}</span>
+              </div>
+
+              <div className="flex items-start">
+                <span className="text-white/90 font-medium mr-2">TIPOS:</span>
+                <div className="flex flex-wrap gap-1">
+                  {treino.cardio.tipos.map((tipo, index) => (
+                    <span
+                      key={index}
+                      className="bg-white/20 px-2 py-1 rounded text-white text-xs font-medium"
+                    >
+                      {tipo}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {treino.cardio.observacoes && (
+                <div className="mt-2 pt-2 border-t border-white/20">
+                  <span className="text-white/90 text-sm">{treino.cardio.observacoes}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
           </div>
         );
   });

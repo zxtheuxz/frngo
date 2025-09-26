@@ -41,6 +41,8 @@ export default defineConfig({
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         navigateFallback: null, // Evita cache de navegação
+        maximumFileSizeToCacheInBytes: 5000000, // 5MB
+        globIgnores: ['**/*.html', '**/*.map', '**/manifest.json', '**/*.webmanifest'], // Excluir arquivos críticos do cache
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -69,7 +71,7 @@ export default defineConfig({
             handler: 'NetworkFirst', // Prioriza rede para JS/CSS
             options: {
               cacheName: 'static-resources',
-              networkTimeoutSeconds: 3,
+              networkTimeoutSeconds: 2 // Timeout mais agressivo
             }
           },
           {
@@ -106,13 +108,30 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
       },
       output: {
-        // Força hash em todos os arquivos para cache busting
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
-        // Força rebuild mesmo com código similar
+        // Cache busting ultra-agressivo com timestamp + hash de conteúdo
+        entryFileNames: (chunkInfo) => {
+          const timestamp = Date.now();
+          return `assets/${chunkInfo.name}-${timestamp}-[hash].js`;
+        },
+        chunkFileNames: (chunkInfo) => {
+          const timestamp = Date.now();
+          return `assets/${chunkInfo.name}-${timestamp}-[hash].js`;
+        },
+        assetFileNames: (assetInfo) => {
+          const timestamp = Date.now();
+          const ext = assetInfo.name?.split('.').pop();
+          const name = assetInfo.name?.replace(`.${ext}`, '');
+          return `assets/${name}-${timestamp}-[hash].${ext}`;
+        },
+        // Força rebuild completo
         manualChunks: undefined
       }
     },
+    // Força rebuild sempre que houver mudanças
+    sourcemap: false,
+    target: 'esnext',
+    cssCodeSplit: true,
+    // Força regeneração de IDs únicos
+    chunkSizeWarningLimit: 1000,
   },
 });

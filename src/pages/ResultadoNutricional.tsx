@@ -232,14 +232,18 @@ export function ResultadoNutricional() {
     let capturandoSecao = false;
     let tituloGeral = '';
     
-    // Primeiro, capturar o título geral
+    // Primeiro, capturar o título geral (removendo informações de calorias e objetivos para clientes)
     for (const linha of linhas) {
-      if (linha.includes('kcal') && (linha.includes('Emagrecimento') || linha.includes('Ganho'))) {
-        tituloGeral = linha;
-        break;
-      }
       if (linha.includes('Planejamento alimentar') || linha.includes('Planejamneto alimentar')) {
-        tituloGeral = linha;
+        // Remover informações de calorias e objetivos do título
+        let tituloLimpo = linha;
+        // Remover informações de kcal
+        tituloLimpo = tituloLimpo.replace(/\d+\s*kcal/gi, '').trim();
+        // Remover informações de emagrecimento ou ganho
+        tituloLimpo = tituloLimpo.replace(/emagrecimento|ganho\s*de?\s*massa?\s*(muscular)?/gi, '').trim();
+        // Limpar múltiplos espaços e traços
+        tituloLimpo = tituloLimpo.replace(/\s*-\s*-\s*|\s+-\s*$|^\s*-\s*/, '').replace(/\s+/g, ' ').trim();
+        tituloGeral = tituloLimpo;
         break;
       }
     }
@@ -298,7 +302,31 @@ export function ResultadoNutricional() {
             linhasFiltradas.push(linha);
           }
         } else {
-          linhasFiltradas.push(linha);
+          // Filtrar receitas culinárias e todos seus componentes
+          if (!linha.includes('Receita culinária') &&
+              !linha.includes('receita culinária') &&
+              !linha.includes('Rendimento:') &&
+              !linha.includes('rendimento:') &&
+              !linha.includes('Ingredientes:') &&
+              !linha.includes('ingredientes:') &&
+              !linha.includes('Forma de preparo:') &&
+              !linha.includes('forma de preparo:') &&
+              !linha.includes('Modo de preparo:') &&
+              !linha.includes('modo de preparo:') &&
+              !linha.includes('Instruções:') &&
+              !linha.includes('instruções:') &&
+              !linha.includes('porção(ões)') &&
+              !linha.includes('porções') &&
+              !linha.includes('serve') &&
+              !linha.match(/^\d+\)/) && // Ignora instruções numeradas
+              !linha.match(/^\d+\.\s/) && // Ignora listas numeradas
+              !linha.toLowerCase().includes('misture') &&
+              !linha.toLowerCase().includes('acrescente') &&
+              !linha.toLowerCase().includes('tempere') &&
+              !linha.toLowerCase().includes('leve ao fogo') &&
+              linha.length > 0) {
+            linhasFiltradas.push(linha);
+          }
         }
       }
     }
@@ -689,18 +717,9 @@ export function ResultadoNutricional() {
           for (let i = 0; i < linhas.length; i++) {
             const linha = linhas[i].trim();
             
-            // Verificar se é uma linha com o tipo/calorias do plano
+            // Pular linhas com calorias e objetivos (não mostrar para clientes)
             if (linha.includes('kcal') && (linha.includes('Emagrecimento') || linha.includes('Ganho'))) {
-              console.log('[gerarPDF] Encontrada linha de calorias/objetivo:', linha);
-              
-              // Verificar e corrigir duplicações no título
-              if (linha.toLowerCase().includes('planejamento alimentar planejamento alimentar') || 
-                  linha.toLowerCase().includes('planejamento alimentar planejamneto alimentar')) {
-                console.log('[gerarPDF] Detectada duplicação no título:', linha);
-                tituloGeral = linha.replace(/planejam[e|n]to\s+alimentar\s+planejam[e|n]to\s+alimentar/i, 'Planejamento Alimentar');
-              } else {
-                tituloGeral = linha;
-              }
+              console.log('[gerarPDF] Removendo linha de calorias/objetivo para cliente:', linha);
               continue;
             }
             
@@ -738,16 +757,31 @@ export function ResultadoNutricional() {
             
             // Se estamos na lista de compras, adicionar item
             if (emListaDeCompras) {
-              // Filtrar apenas ingredientes válidos
-              if (!linha.match(regexRefeicao) && !linha.match(regexTitulo) && 
-                  !linha.includes('Planejamento alimentar') && 
+              // Filtrar ingredientes válidos (removendo receitas culinárias)
+              if (!linha.match(regexRefeicao) && !linha.match(regexTitulo) &&
+                  !linha.includes('Planejamento alimentar') &&
                   !linha.startsWith('•') &&
                   !linha.includes('Receita culinária') &&
+                  !linha.includes('receita culinária') &&
                   !linha.includes('Rendimento:') &&
+                  !linha.includes('rendimento:') &&
                   !linha.includes('Ingredientes:') &&
+                  !linha.includes('ingredientes:') &&
                   !linha.includes('Forma de preparo:') &&
+                  !linha.includes('forma de preparo:') &&
+                  !linha.includes('Modo de preparo:') &&
+                  !linha.includes('modo de preparo:') &&
+                  !linha.includes('Instruções:') &&
+                  !linha.includes('instruções:') &&
                   !linha.includes('porção(ões)') &&
+                  !linha.includes('porções') &&
+                  !linha.includes('serve') &&
                   !linha.match(/^\d+\)/) && // Ignora instruções numeradas
+                  !linha.match(/^\d+\.\s/) && // Ignora listas numeradas
+                  !linha.toLowerCase().includes('tempero') &&
+                  !linha.toLowerCase().includes('pitada') &&
+                  !linha.toLowerCase().includes('colher') &&
+                  !linha.toLowerCase().includes('xícara') &&
                   linha.length > 2 && linha.length < 100) { // Tamanho razoável
                 listaDeCompras.push(linha);
               }
@@ -848,9 +882,21 @@ export function ResultadoNutricional() {
                 continue;
               }
               
-              // Se não estamos em observações nem substituições, deve ser um alimento
+              // Se não estamos em observações nem substituições, deve ser um alimento (filtrando receitas)
               const matchAlimento = linha.match(regexAlimento);
-              if (matchAlimento && !linha.startsWith('•') && !linha.includes('Lista de compras')) {
+              if (matchAlimento &&
+                  !linha.startsWith('•') &&
+                  !linha.includes('Lista de compras') &&
+                  !linha.includes('Receita culinária') &&
+                  !linha.includes('receita culinária') &&
+                  !linha.includes('Rendimento:') &&
+                  !linha.includes('Ingredientes:') &&
+                  !linha.includes('Forma de preparo:') &&
+                  !linha.includes('Modo de preparo:') &&
+                  !linha.includes('porção(ões)') &&
+                  !linha.includes('serve') &&
+                  !linha.match(/^\d+\)/) &&
+                  !linha.match(/^\d+\.\s/)) {
                 // Extrair nome e porção
                 const partes = linha.split('\n');
                 const nome = partes[0].trim();
@@ -876,25 +922,7 @@ export function ResultadoNutricional() {
             refeicoes.push(refeicaoAtual);
           }
           
-          // Extrair informações do título para destacar o tipo de dieta
-          let tipoDieta = "";
-          let objetivoDieta = "";
-          let caloriasTexto = "";
-          
-          if (tituloGeral) {
-            // Verificar se contém informações sobre calorias
-            const matchCalorias = tituloGeral.match(/(\d+)\s*kcal/i);
-            if (matchCalorias) {
-              caloriasTexto = matchCalorias[1] + " kcal";
-            }
-            
-            // Verificar se contém informações sobre emagrecimento ou ganho
-            if (tituloGeral.toLowerCase().includes("emagrecimento")) {
-              objetivoDieta = "Emagrecimento";
-            } else if (tituloGeral.toLowerCase().includes("ganho")) {
-              objetivoDieta = "Ganho Muscular";
-            }
-          }
+          // Informações removidas: calorias e objetivos não são mais exibidos para clientes
           
           // Adicionar o título do planejamento alimentar com bordas arredondadas
           doc.setFillColor(251, 146, 60); // Laranja #FB923C
@@ -905,21 +933,7 @@ export function ResultadoNutricional() {
           doc.text('PLANEJAMENTO ALIMENTAR', doc.internal.pageSize.width / 2, posicaoY + 6, { align: 'center' });
           posicaoY += 15;
           
-          // Adicionar informações de calorias e objetivo em destaque
-          if (caloriasTexto || objetivoDieta) {
-            let infoText = '';
-            if (caloriasTexto) infoText += caloriasTexto;
-            if (caloriasTexto && objetivoDieta) infoText += ' - ';
-            if (objetivoDieta) infoText += objetivoDieta;
-            
-            doc.setFillColor(245, 245, 245); // Cinza claro
-            doc.rect(margemEsquerda, posicaoY, larguraUtil, 8, 'F');
-            doc.setFontSize(10);
-            doc.setTextColor(236, 72, 21); // Laranja
-            doc.setFont('helvetica', 'bold');
-            doc.text(infoText, doc.internal.pageSize.width / 2, posicaoY + 5, { align: 'center' });
-            posicaoY += 13;
-          }
+          // Informações de calorias e objetivos removidas para clientes
           
           // Renderizar cada refeição como uma tabela
           for (const refeicao of refeicoes) {
@@ -1374,18 +1388,9 @@ export function ResultadoNutricional() {
         for (let i = 0; i < linhas.length; i++) {
           const linha = linhas[i].trim();
           
-          // Verificar se é uma linha com o tipo/calorias do plano
+          // Pular linhas com calorias e objetivos (não mostrar para clientes)
           if (linha.includes('kcal') && (linha.includes('Emagrecimento') || linha.includes('Ganho'))) {
-            console.log('Encontrada linha de calorias/objetivo:', linha);
-            
-            // Verificar e corrigir duplicações no título
-            if (linha.toLowerCase().includes('planejamento alimentar planejamento alimentar') || 
-                linha.toLowerCase().includes('planejamento alimentar planejamneto alimentar')) {
-              console.log('Detectada duplicação no título:', linha);
-              tituloGeral = linha.replace(/planejam[e|n]to\s+alimentar\s+planejam[e|n]to\s+alimentar/i, 'Planejamento Alimentar');
-            } else {
-              tituloGeral = linha;
-            }
+            console.log('Removendo linha de calorias/objetivo para cliente:', linha);
             continue;
           }
           
@@ -1525,9 +1530,21 @@ export function ResultadoNutricional() {
               continue;
             }
             
-            // Se não estamos em observações nem substituições, deve ser um alimento
+            // Se não estamos em observações nem substituições, deve ser um alimento (filtrando receitas)
             const matchAlimento = linha.match(regexAlimento);
-            if (matchAlimento && !linha.startsWith('•') && !linha.includes('Lista de compras')) {
+            if (matchAlimento &&
+                !linha.startsWith('•') &&
+                !linha.includes('Lista de compras') &&
+                !linha.includes('Receita culinária') &&
+                !linha.includes('receita culinária') &&
+                !linha.includes('Rendimento:') &&
+                !linha.includes('Ingredientes:') &&
+                !linha.includes('Forma de preparo:') &&
+                !linha.includes('Modo de preparo:') &&
+                !linha.includes('porção(ões)') &&
+                !linha.includes('serve') &&
+                !linha.match(/^\d+\)/) &&
+                !linha.match(/^\d+\.\s/)) {
               // Extrair nome e porção
               const partes = linha.split('\n');
               const nome = partes[0].trim();
@@ -1553,25 +1570,7 @@ export function ResultadoNutricional() {
           refeicoes.push(refeicaoAtual);
         }
         
-        // Extrair informações do título para destacar o tipo de dieta
-        let tipoDieta = "";
-        let objetivoDieta = "";
-        let caloriasTexto = "";
-        
-        if (tituloGeral) {
-          // Verificar se contém informações sobre calorias
-          const matchCalorias = tituloGeral.match(/(\d+)\s*kcal/i);
-          if (matchCalorias) {
-            caloriasTexto = matchCalorias[1] + " kcal";
-          }
-          
-          // Verificar se contém informações sobre emagrecimento ou ganho
-          if (tituloGeral.toLowerCase().includes("emagrecimento")) {
-            objetivoDieta = "Emagrecimento";
-          } else if (tituloGeral.toLowerCase().includes("ganho")) {
-            objetivoDieta = "Ganho Muscular";
-          }
-        }
+        // Informações removidas: calorias e objetivos não são mais exibidos para clientes
         
         // Renderizar o planejamento alimentar em uma interface moderna
         return (
@@ -1610,10 +1609,10 @@ export function ResultadoNutricional() {
               </div>
             )}
 
-            {/* Título principal com informações de calorias e objetivo */}
+            {/* Título principal (informações de calorias e objetivos removidas para clientes) */}
             {tituloGeral && (
               <div className="bg-orange-500 text-white p-3 rounded-t-lg text-center font-bold text-lg">
-                {tituloGeral}
+                Planejamento Alimentar
               </div>
             )}
             

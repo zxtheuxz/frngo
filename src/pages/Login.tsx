@@ -7,9 +7,99 @@ import { useTheme } from '../contexts/ThemeContext';
 import '../styles/global.css';
 
 // Helper para logs condicionais de debug (preserva stack trace)
-const debugLog = process.env.NODE_ENV === 'development' 
-  ? console.log.bind(console) 
+const debugLog = process.env.NODE_ENV === 'development'
+  ? console.log.bind(console)
   : () => {};
+
+// Função para limpeza agressiva de cache
+const clearAllCaches = async () => {
+  console.log('🧹 Iniciando limpeza agressiva de cache...');
+
+  try {
+    // 1. Limpar Service Worker caches
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map(cacheName => {
+          console.log(`🗑️ Removendo cache: ${cacheName}`);
+          return caches.delete(cacheName);
+        })
+      );
+    }
+
+    // 2. Limpar localStorage (incluindo tokens antigos)
+    if (typeof Storage !== 'undefined') {
+      const localKeys = Object.keys(localStorage);
+      localKeys.forEach(key => {
+        if (key.startsWith('supabase') || key.includes('auth') || key.includes('cache')) {
+          localStorage.removeItem(key);
+          console.log(`🗑️ Removido do localStorage: ${key}`);
+        }
+      });
+    }
+
+    // 3. Limpar sessionStorage
+    if (typeof Storage !== 'undefined') {
+      const sessionKeys = Object.keys(sessionStorage);
+      sessionKeys.forEach(key => {
+        sessionStorage.removeItem(key);
+        console.log(`🗑️ Removido do sessionStorage: ${key}`);
+      });
+    }
+  } catch (error) {
+    console.error('❌ Erro na limpeza de cache:', error);
+  }
+
+  console.log('✅ Cache limpo com sucesso!');
+};
+
+// Versão que preserva tokens de autenticação válidos
+const clearCachePreservingAuth = async () => {
+  console.log('🧽 Limpeza seletiva preservando autenticação...');
+
+  try {
+    // 1. Limpar Service Worker caches (seguro)
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map(cacheName => {
+          console.log(`🗑️ Removendo cache: ${cacheName}`);
+          return caches.delete(cacheName);
+        })
+      );
+    }
+
+    // 2. Limpar sessionStorage (dados temporários)
+    if (typeof Storage !== 'undefined') {
+      const sessionKeys = Object.keys(sessionStorage);
+      sessionKeys.forEach(key => {
+        // Só remove dados não relacionados a auth ativa
+        if (!key.includes('supabase.auth.token') && !key.includes('sb-')) {
+          sessionStorage.removeItem(key);
+          console.log(`🗑️ Removido do sessionStorage: ${key}`);
+        }
+      });
+    }
+
+    // 3. Limpar localStorage seletivamente (preserva tokens ativos)
+    if (typeof Storage !== 'undefined') {
+      const localKeys = Object.keys(localStorage);
+      localKeys.forEach(key => {
+        // Remove cache mas preserva tokens de sessão ativa
+        if (key.includes('cache') || key.includes('theme') ||
+            (key.includes('supabase') && !key.includes('auth.token') && !key.includes('sb-'))) {
+          localStorage.removeItem(key);
+          console.log(`🗑️ Removido seletivamente: ${key}`);
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Erro na limpeza seletiva:', error);
+  }
+
+  console.log('✅ Cache seletivo limpo (auth preservado)!');
+};
 
 export function Login() {
   const navigate = useNavigate();
@@ -25,6 +115,10 @@ export function Login() {
   const [recuperandoSenha, setRecuperandoSenha] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Limpeza agressiva de cache ao carregar o Login
+  useEffect(() => {
+    clearAllCaches();
+  }, []);
 
   // Verificar se há mensagem de redirecionamento
   useEffect(() => {
@@ -48,47 +142,60 @@ export function Login() {
 
   // Detectar quando login e perfil completaram para fazer redirecionamento
   useEffect(() => {
-    // Só redirecionar se:
-    // 1. Não está mais carregando (loading = false)
-    // 2. Não está carregando perfil (profileLoading = false)
-    // 3. Tem userProfile carregado
-    // 4. Não há erro
-    if (!loading && !profileLoading && userProfile && !erro) {
-      const userRole = userProfile.role;
-      debugLog(`Login: Redirecionamento automático. Role: ${userRole}`);
+    const handleRedirect = async () => {
+      // Só redirecionar se:
+      // 1. Não está mais carregando (loading = false)
+      // 2. Não está carregando perfil (profileLoading = false)
+      // 3. Tem userProfile carregado
+      // 4. Não há erro
+      if (!loading && !profileLoading && userProfile && !erro) {
+        const userRole = userProfile.role;
+        debugLog(`Login: Redirecionamento automático. Role: ${userRole}`);
 
-      // BLOQUEAR admin e preparador - fazer logout imediato
-      if (userRole === 'admin' || userRole === 'preparador') {
-        debugLog('Login: Staff user detectado, fazendo logout e bloqueando acesso');
+        // BLOQUEAR admin e preparador - fazer logout imediato
+        if (userRole === 'admin' || userRole === 'preparador') {
+          debugLog('Login: Staff user detectado, fazendo logout e bloqueando acesso');
 
+          signOut();
+
+          setErro('Admins e preparadores devem usar o Login Staff. Acesse através do link abaixo.');
+
+          setTimeout(() => {
+            navigate('/staff', {
+              state: {
+                message: 'Use este login para acessar como admin ou preparador.',
+                email: email
+              }
+            });
+          }, 3000);
+          return;
+        }
+
+        // PERMITIR usuários normais (cliente/usuario)
+        if (userRole === 'cliente' || userRole === 'usuario') {
+          const defaultRoute = getDefaultRouteForRole();
+          debugLog(`Login: Redirecionando para ${defaultRoute}`);
+
+          // Limpeza seletiva preservando autenticação válida
+          try {
+            await clearCachePreservingAuth();
+            debugLog('Login: Cache seletivo limpo com sucesso');
+          } catch (error) {
+            console.warn('Login: Erro ao limpar cache seletivamente (continuando):', error);
+          }
+
+          navigate(defaultRoute);
+          return;
+        }
+
+        // Role não reconhecido
+        debugLog(`Login: Role não reconhecido: ${userRole}`);
         signOut();
-
-        setErro('Admins e preparadores devem usar o Login Staff. Acesse através do link abaixo.');
-
-        setTimeout(() => {
-          navigate('/staff', {
-            state: {
-              message: 'Use este login para acessar como admin ou preparador.',
-              email: email
-            }
-          });
-        }, 3000);
-        return;
+        setErro('Tipo de usuário não reconhecido. Entre em contato com o suporte.');
       }
+    };
 
-      // PERMITIR usuários normais (cliente/usuario)
-      if (userRole === 'cliente' || userRole === 'usuario') {
-        const defaultRoute = getDefaultRouteForRole();
-        debugLog(`Login: Redirecionando para ${defaultRoute}`);
-        navigate(defaultRoute);
-        return;
-      }
-
-      // Role não reconhecido
-      debugLog(`Login: Role não reconhecido: ${userRole}`);
-      signOut();
-      setErro('Tipo de usuário não reconhecido. Entre em contato com o suporte.');
-    }
+    handleRedirect();
   }, [loading, profileLoading, userProfile, erro, navigate, signOut, getDefaultRouteForRole, email]);
 
   // DEBUG: Log do render completo

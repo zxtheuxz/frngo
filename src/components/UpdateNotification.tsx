@@ -8,7 +8,7 @@ interface UpdateNotificationProps {
 
 const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
   const [showReloadPrompt, setShowReloadPrompt] = useState(false);
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(1);
 
   // Função para forçar reload bypass cache
   const forceReload = useCallback(() => {
@@ -39,7 +39,7 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
     onNeedRefresh() {
       console.log('🆕 Nova versão detectada!');
       setShowReloadPrompt(true);
-      setCountdown(5);
+      setCountdown(1);
     },
     onOfflineReady() {
       console.log('✅ App pronto offline');
@@ -50,7 +50,7 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
     setOfflineReady(false);
     setNeedRefresh(false);
     setShowReloadPrompt(false);
-    setCountdown(5);
+    setCountdown(1);
     onClose?.();
   };
 
@@ -80,41 +80,99 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
     }
   }, [needRefresh, countdown]);
 
-  // Sistema de detecção de mudanças por polling
+  // Sistema de detecção de mudanças ultra-agressivo
   useEffect(() => {
     const checkForUpdates = async () => {
       try {
-        const response = await fetch(window.location.href, {
+        // Múltiplas verificações para maior confiabilidade
+        const timestamp = Date.now();
+        const response = await fetch(`${window.location.href}?_t=${timestamp}`, {
           cache: 'no-cache',
+          method: 'GET',
           headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
           }
         });
 
         if (response.ok) {
           const currentVersion = document.querySelector('meta[name="build-version"]')?.getAttribute('content');
+          const currentDeployId = document.querySelector('meta[name="deploy-id"]')?.getAttribute('content');
+          const currentTimestamp = document.querySelector('meta[name="build-timestamp"]')?.getAttribute('content');
+
           const html = await response.text();
           const parser = new DOMParser();
           const doc = parser.parseFromString(html, 'text/html');
-          const newVersion = doc.querySelector('meta[name="build-version"]')?.getAttribute('content');
 
-          if (currentVersion && newVersion && currentVersion !== newVersion) {
-            console.log(`🆕 Nova versão detectada: ${currentVersion} → ${newVersion}`);
+          const newVersion = doc.querySelector('meta[name="build-version"]')?.getAttribute('content');
+          const newDeployId = doc.querySelector('meta[name="deploy-id"]')?.getAttribute('content');
+          const newTimestamp = doc.querySelector('meta[name="build-timestamp"]')?.getAttribute('content');
+
+          // Verificação tripla para garantir detecção de updates
+          const versionChanged = currentVersion && newVersion && currentVersion !== newVersion;
+          const deployIdChanged = currentDeployId && newDeployId && currentDeployId !== newDeployId;
+          const timestampChanged = currentTimestamp && newTimestamp && currentTimestamp !== newTimestamp;
+
+          if (versionChanged || deployIdChanged || timestampChanged) {
+            console.log('🚀 NOVA VERSÃO DETECTADA! Forçando update...');
+            console.log(`📝 Version: ${currentVersion} → ${newVersion}`);
+            console.log(`🆔 Deploy ID: ${currentDeployId} → ${newDeployId}`);
+            console.log(`⏰ Timestamp: ${currentTimestamp} → ${newTimestamp}`);
+
             setShowReloadPrompt(true);
-            setCountdown(3);
+            setCountdown(1);
+
+            // Auto-reload ultra rápido (500ms)
+            setTimeout(() => {
+              console.log('⚡ Auto-reload executado!');
+              forceReload();
+            }, 500);
           }
         }
       } catch (error) {
-        console.error('Erro checking updates:', error);
+        console.error('❌ Erro checking updates:', error);
       }
     };
 
-    // Check a cada 30 segundos
-    const interval = setInterval(checkForUpdates, 30000);
+    // Verificação muito mais frequente (5 segundos)
+    const interval = setInterval(checkForUpdates, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+    // Verificação imediata quando janela ganha foco
+    const handleWindowFocus = () => {
+      console.log('👀 Foco recuperado, verificando updates...');
+      checkForUpdates();
+    };
+
+    // Verificação quando volta de background (visibilitychange)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('👀 App visível, verificando updates...');
+        checkForUpdates();
+      }
+    };
+
+    // Verificação quando há conexão de rede
+    const handleOnline = () => {
+      console.log('🌐 Conexão restaurada, verificando updates...');
+      setTimeout(checkForUpdates, 1000);
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('online', handleOnline);
+
+    // Verificação inicial após 2 segundos
+    const initialCheck = setTimeout(checkForUpdates, 2000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(initialCheck);
+      window.removeEventListener('focus', handleWindowFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [forceReload]);
 
   if (!showReloadPrompt) return null;
 
@@ -130,8 +188,8 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
               </h3>
               <p className="text-xs text-red-100 mt-1">
                 {countdown > 0
-                  ? `Atualizando automaticamente em ${countdown}s...`
-                  : 'Atualizando agora!'
+                  ? `⚡ Atualizando em ${countdown}s...`
+                  : '🚀 Atualizando agora!'
                 }
               </p>
             </div>
@@ -168,7 +226,7 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
               <div
                 className="bg-white h-1 rounded-full transition-all duration-1000"
                 style={{
-                  width: `${((5 - countdown) / 5) * 100}%`
+                  width: `${((1 - countdown) / 1) * 100}%`
                 }}
               />
             </div>

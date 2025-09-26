@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { Scale, AlertCircle, CheckCircle, Loader2, ClipboardCheck, ArrowLeft, Heart, User, Sun, Moon } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader2, ArrowLeft, Heart, User, Sun, Moon } from 'lucide-react';
 import { Layout } from '../../components/Layout';
 import { useTheme } from '../../contexts/ThemeContext';
 import { getThemeClass } from '../../styles/theme';
@@ -46,8 +46,6 @@ export function AvaliacaoNutricionalMasculina() {
   const [sucesso, setSucesso] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4; // Dividir em 4 etapas
-  const [confirmedStep4, setConfirmedStep4] = useState(false);
-  const [showConfirmationMessage, setShowConfirmationMessage] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   
   // Estados para o modal de consentimento
@@ -475,19 +473,19 @@ export function AvaliacaoNutricionalMasculina() {
     } 
     else if (step === 2) {
       // Validação da etapa 2 - Histórico de Saúde
-      if (formData.tem_doencas_cronicas && formData.doencas_cronicas.length === 0) {
+      if (formData.tem_doencas_cronicas && (!formData.doencas_cronicas.length || formData.doencas_cronicas.every(item => item.trim() === ''))) {
         errors.doencas_cronicas = "Por favor, especifique as doenças crônicas";
       }
-      if (formData.tem_cirurgias && formData.cirurgias_anteriores.length === 0) {
+      if (formData.tem_cirurgias && (!formData.cirurgias_anteriores.length || formData.cirurgias_anteriores.every(item => item.trim() === ''))) {
         errors.cirurgias_anteriores = "Por favor, especifique as cirurgias";
       }
-      if (formData.tem_intolerancia && formData.intolerancia_alimentar.length === 0) {
+      if (formData.tem_intolerancia && (!formData.intolerancia_alimentar.length || formData.intolerancia_alimentar.every(item => item.trim() === ''))) {
         errors.intolerancia_alimentar = "Por favor, especifique as intolerâncias";
       }
-      if (formData.tem_medicamentos && formData.medicamentos.length === 0) {
+      if (formData.tem_medicamentos && (!formData.medicamentos.length || formData.medicamentos.every(item => item.trim() === ''))) {
         errors.medicamentos = "Por favor, especifique os medicamentos";
       }
-      if (formData.tem_historico_familiar && formData.historico_familiar_doencas.length === 0) {
+      if (formData.tem_historico_familiar && (!formData.historico_familiar_doencas.length || formData.historico_familiar_doencas.every(item => item.trim() === ''))) {
         errors.historico_familiar_doencas = "Por favor, especifique as doenças do histórico familiar";
       }
     }
@@ -528,14 +526,6 @@ export function AvaliacaoNutricionalMasculina() {
     }
   };
 
-  // Função para confirmar última etapa
-  const confirmStep4 = () => {
-    setConfirmedStep4(true);
-    setShowConfirmationMessage(true);
-    setTimeout(() => {
-      setShowConfirmationMessage(false);
-    }, 5000);
-  };
 
   const handleConfirmSubmit = () => {
     setShowConfirmModal(false);
@@ -1115,6 +1105,28 @@ export function AvaliacaoNutricionalMasculina() {
                               <span className={themeClasses.radioLabel}>Não</span>
                             </label>
                           </div>
+
+                          {formData.tem_doencas_cronicas && (
+                            <div className="mt-4">
+                              <label className={themeClasses.label}>
+                                Especifique as doenças crônicas
+                              </label>
+                              <p className={themeClasses.helperText}>
+                                Digite uma doença por linha
+                              </p>
+                              <textarea
+                                name="doencas_cronicas"
+                                value={formData.doencas_cronicas.join('\n')}
+                                onChange={handleArrayChange}
+                                className={themeClasses.input}
+                                rows={3}
+                                placeholder="Ex: Diabetes tipo 2&#10;Hipertensão&#10;Colesterol alto"
+                              />
+                              {formErrors.doencas_cronicas && (
+                                <p className={themeClasses.errorText}>{formErrors.doencas_cronicas}</p>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         <div className="space-y-4">
@@ -1148,6 +1160,28 @@ export function AvaliacaoNutricionalMasculina() {
                               <span className={themeClasses.radioLabel}>Não</span>
                             </label>
                           </div>
+
+                          {formData.tem_cirurgias && (
+                            <div className="mt-4">
+                              <label className={themeClasses.label}>
+                                Especifique as cirurgias realizadas
+                              </label>
+                              <p className={themeClasses.helperText}>
+                                Digite uma cirurgia por linha
+                              </p>
+                              <textarea
+                                name="cirurgias_anteriores"
+                                value={formData.cirurgias_anteriores.join('\n')}
+                                onChange={handleArrayChange}
+                                className={themeClasses.input}
+                                rows={3}
+                                placeholder="Ex: Apendicite (2020)&#10;Cirurgia de vesícula (2018)&#10;Cirurgia ortopédica no joelho (2019)"
+                              />
+                              {formErrors.cirurgias_anteriores && (
+                                <p className={themeClasses.errorText}>{formErrors.cirurgias_anteriores}</p>
+                              )}
+                            </div>
+                          )}
                         </div>
                         
                         <div className="space-y-4">
@@ -1181,6 +1215,28 @@ export function AvaliacaoNutricionalMasculina() {
                               <span className={themeClasses.radioLabel}>Não</span>
                             </label>
                           </div>
+
+                          {formData.tem_intolerancia && (
+                            <div className="mt-4">
+                              <label className={themeClasses.label}>
+                                Especifique as intolerâncias alimentares
+                              </label>
+                              <p className={themeClasses.helperText}>
+                                Digite uma intolerância por linha
+                              </p>
+                              <textarea
+                                name="intolerancia_alimentar"
+                                value={formData.intolerancia_alimentar.join('\n')}
+                                onChange={handleArrayChange}
+                                className={themeClasses.input}
+                                rows={3}
+                                placeholder="Ex: Lactose&#10;Glúten&#10;Frutos do mar"
+                              />
+                              {formErrors.intolerancia_alimentar && (
+                                <p className={themeClasses.errorText}>{formErrors.intolerancia_alimentar}</p>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         <div className="space-y-4">
@@ -1214,6 +1270,28 @@ export function AvaliacaoNutricionalMasculina() {
                               <span className={themeClasses.radioLabel}>Não</span>
                             </label>
                           </div>
+
+                          {formData.tem_medicamentos && (
+                            <div className="mt-4">
+                              <label className={themeClasses.label}>
+                                Especifique os medicamentos em uso
+                              </label>
+                              <p className={themeClasses.helperText}>
+                                Digite um medicamento por linha (com dosagem se possível)
+                              </p>
+                              <textarea
+                                name="medicamentos"
+                                value={formData.medicamentos.join('\n')}
+                                onChange={handleArrayChange}
+                                className={themeClasses.input}
+                                rows={3}
+                                placeholder="Ex: Losartana 50mg&#10;Sinvastatina 20mg&#10;Omeprazol 40mg"
+                              />
+                              {formErrors.medicamentos && (
+                                <p className={themeClasses.errorText}>{formErrors.medicamentos}</p>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         <div className="space-y-4">
@@ -1247,6 +1325,28 @@ export function AvaliacaoNutricionalMasculina() {
                               <span className={themeClasses.radioLabel}>Não</span>
                             </label>
                           </div>
+
+                          {formData.tem_historico_familiar && (
+                            <div className="mt-4">
+                              <label className={themeClasses.label}>
+                                Especifique as doenças do histórico familiar
+                              </label>
+                              <p className={themeClasses.helperText}>
+                                Digite uma doença por linha (com grau de parentesco se possível)
+                              </p>
+                              <textarea
+                                name="historico_familiar_doencas"
+                                value={formData.historico_familiar_doencas.join('\n')}
+                                onChange={handleArrayChange}
+                                className={themeClasses.input}
+                                rows={3}
+                                placeholder="Ex: Diabetes - pai&#10;Hipertensão - mãe&#10;Câncer de mama - avó materna"
+                              />
+                              {formErrors.historico_familiar_doencas && (
+                                <p className={themeClasses.errorText}>{formErrors.historico_familiar_doencas}</p>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         <div className="space-y-4">
@@ -1728,38 +1828,24 @@ export function AvaliacaoNutricionalMasculina() {
                       </button>
                     )}
                     {currentStep === 4 && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={confirmStep4}
-                          className={`group flex items-center px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 ${
-                            isDarkMode 
-                              ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50 border border-gray-600' 
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
-                          }`}
-                        >
-                          <ArrowLeft className="h-4 w-4 mr-2 transition-transform group-hover:-translate-x-1" />
-                          Revisar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmModal(true)}
-                          disabled={loading}
-                          className={`group flex items-center px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105 bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed`}
-                        >
-                          {loading ? (
-                            <span className="flex items-center">
-                              <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                              Enviando...
-                            </span>
-                          ) : (
-                            <>
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Enviar Formulário
-                            </>
-                          )}
-                        </button>
-                      </>
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmModal(true)}
+                        disabled={loading}
+                        className={`group flex items-center px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105 bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed ml-auto`}
+                      >
+                        {loading ? (
+                          <span className="flex items-center">
+                            <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                            Enviando...
+                          </span>
+                        ) : (
+                          <>
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Enviar Formulário
+                          </>
+                        )}
+                      </button>
                     )}
                   </div>
                 </form>

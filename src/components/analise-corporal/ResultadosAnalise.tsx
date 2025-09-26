@@ -453,12 +453,13 @@ const ResultadosAnalise: React.FC<ResultadosAnaliseProps> = ({ resultado }) => {
           {/* Legenda de cores para esta seção */}
           <LegendaCores />
 
-          {/* Percentual de gordura com escala limpa */}
+          {/* TEMPORARIAMENTE REMOVIDO - Percentual de gordura com escala limpa */}
+          {/*
           <div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               O percentual de gordura nessa avaliação tem como objetivo classificar risco para doenças cardiometabólicas, portanto não possui fins estéticos.
             </p>
-            
+
             <EscalaRiscoLimpa
               titulo="Percentual de gordura"
               valorAtual={dados.composicao.percentualGordura}
@@ -467,8 +468,10 @@ const ResultadosAnalise: React.FC<ResultadosAnaliseProps> = ({ resultado }) => {
               resultadoTexto={interpretacoes.percentualGordura}
             />
           </div>
+          */}
 
-          {/* Índices em grid com escalas limpas */}
+          {/* TEMPORARIAMENTE REMOVIDO - Índices em grid com escalas limpas */}
+          {/*
           <div className="grid grid-cols-1 gap-6">
             <EscalaRiscoLimpa
               titulo="Índice de massa magra"
@@ -478,7 +481,7 @@ const ResultadosAnalise: React.FC<ResultadosAnaliseProps> = ({ resultado }) => {
               resultadoTexto={dados.indices.indiceMassaMagra.descricao}
               altura="pequena"
             />
-            
+
             <EscalaRiscoLimpa
               titulo="Índice de massa gorda"
               valorAtual={dados.indices.indiceMassaGorda.valor}
@@ -488,6 +491,7 @@ const ResultadosAnalise: React.FC<ResultadosAnaliseProps> = ({ resultado }) => {
               altura="pequena"
             />
           </div>
+          */}
         </div>
       </div>
 
@@ -556,10 +560,12 @@ const ResultadosAnalise: React.FC<ResultadosAnaliseProps> = ({ resultado }) => {
         </div>
       </div>
 
-      {/* GRID DE INDICADORES - Cards organizados como o Shaped */}
+      {/* TEMPORARIAMENTE REMOVIDO - GRID DE INDICADORES - Cards organizados como o Shaped */}
+      {/*
       <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
         <GridIndicadores dados={dados} />
       </div>
+      */}
 
       {/* PÁGINA 2 - Medidas e Avatar */}
       <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
@@ -573,12 +579,14 @@ const ResultadosAnalise: React.FC<ResultadosAnaliseProps> = ({ resultado }) => {
             />
           </div>
 
-          {/* Lado direito - Gráfico de Dispersão */}
+          {/* TEMPORARIAMENTE REMOVIDO - Lado direito - Gráfico de Dispersão */}
+          {/*
           <GraficoDispersao
             indiceMassaMagra={dados.indices.indiceMassaMagra.valor}
             indiceMassaGorda={dados.indices.indiceMassaGorda.valor}
             sexo={dados.perfil.sexo}
           />
+          */}
         </div>
         
         {/* Tabela de medidas extraídas - Abaixo dos gráficos */}
@@ -656,10 +664,12 @@ const ResultadosAnalise: React.FC<ResultadosAnaliseProps> = ({ resultado }) => {
         </div>
       </div>
 
-      {/* TABELA DE REFERÊNCIAS - Como o Shaped tem */}
+      {/* TEMPORARIAMENTE REMOVIDO - TABELA DE REFERÊNCIAS - Como o Shaped tem */}
+      {/*
       <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
         <TabelaReferencias dados={dados} />
       </div>
+      */}
 
       {/* Aviso final igual ao PDF */}
       <div className="border-t border-gray-200 dark:border-gray-700 pt-6 text-center">
